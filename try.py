@@ -38,6 +38,7 @@ while(realData!='0'):
 	# print(type(myPort))
 	# myPort.open()
 	# serial.Serial().write()
+	# ksdfsdf
 
 
 
