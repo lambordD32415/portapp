@@ -7,3 +7,4 @@ for port in serial.tools.list_ports.comports():
 	
 	
 	# 65651261
+	# asdasfadf
