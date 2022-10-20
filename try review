@@ -1,0 +1,57 @@
+import serial
+
+# gets the waiting data in the port and returns it 
+def getWaitingDataFromPort(port = serial.Serial.port): #CODE REVIEW - There shouldn't be a default value here
+	while(True): #CODE REVIEW - This shouldn't be infinite loop, you should stop the loop when you get data in port.
+		data = port.read(port.in_waiting)
+		decodedData = data.decode('utf-8')
+		return decodedData #CODE REVIEW - This return shouldn't be inside the loop.
+
+# sending data to a port
+def sendDataToPort(data, destinationPort = serial.Serial.port): #CODE REVIEW - There shouldn't be a default value here
+	print(destinationPort) #CODE REVIEW - Remove this print
+	destinationPort.write(data.encode('utf-8'))
+
+# openning the port that going to use and checking if it proper
+def getPortNameAndConnect(portToEnter):
+# letting the loop start
+	numErr = 1 #CODE REVIEW - This variable is unneeded, you can check if the openning is successeful
+	'''
+	a loop that asks the user which port to connect and connect it
+	but if the name of the port is not exist or already open then he asks agian 
+	as well numErr shows if thier is any errors in a way that
+	if numErr is equal 1 thier is an error and if it equals 0 so thier are no errors at all
+	'''
+	while(numErr != 0): #CODE REVIEW - Here you can use Serial.is_open and not this variable
+		try:
+			portName = "\\\\.\\" + input("Enter " + portToEnter + " Port To Connect ")
+			port = serial.Serial(portName)
+			numErr = 0
+			# clears the waiting data before use it
+			port.read(port.in_waiting)
+			return port #CODE REVIEW - This return should be outside of the loop
+		except serial.serialutil.SerialException:
+			print("ERROR - this port not found or already open")
+
+# main
+if __name__ == "__main__":
+# getting information from the user and openning the useing ports
+	originalPort = getPortNameAndConnect("Original")
+	virtualPort = getPortNameAndConnect("Virtual")
+# letting the loop start
+	data = '1'
+	'''
+		a loop that getting waiting data from ports
+		and transforming it from original port to a virtual ports and vice versa 
+		than it stops tranforming when the data equals '0' and in the last if term
+		thier is a command that prints "the transforming stoped" in the console 
+	'''
+	while(data != '0'): #CODE REVIEW - This should be in a different function. Why? because later the main function won't be here but in an other file
+		if(originalPort.in_waiting != 0):
+			data = getWaitingDataFromPort(originalPort)
+			sendDataToPort(data, virtualPort)
+		elif(virtualPort.in_waiting != 0):
+			data = getWaitingDataFromPort(virtualPort)
+			sendDataToPort(data, originalPort)
+		if(data == '0'):
+			print("the transforming stoped")
